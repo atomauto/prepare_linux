@@ -1,0 +1,13 @@
+
+============[ System Info ]====================================================
+            Host = Gigabyte Technology Co., Ltd. AX370M-DS3H-CF
+              OS = Ubuntu 22.04.1 LTS x86_64
+          Kernel = 5.15.0-53-generic
+        Local IP =  192.168.1.14 
+       Public IP = 178.91.187.129
+          Uptime = 8 hours, 35 minutes
+             CPU = 8 x AMD Ryzen 5 2400G with Radeon Vega Graphics
+    Load average = [32m1.18[0m, [32m1.04[0m, [32m0.86[0m, 
+          Memory = 4.50GiB / 5.74GiB (78%)
+     Swap Memory = 2602 MB Free of 5071 MB Total
+       Processes = 339 of 23049 MAX
