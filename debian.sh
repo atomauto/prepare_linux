@@ -107,4 +107,4 @@ apt install -y coreutils bc procps hostname mawk bind9-host lsb-release
 chmod +x print_functions.sh motd.sh
 cp print_functions.sh /usr/bin/print_functions.sh
 cp motd.sh /usr/bin/motd.sh
-echo "*/5 * * * * root /usr/bin/motd.sh > /etc/motd" >> /etc/crontab
+grep "*/5 * * * * root /usr/bin/motd.sh > /etc/motd" /etc/crontab || echo "*/5 * * * * root /usr/bin/motd.sh > /etc/motd" >> /etc/crontab
