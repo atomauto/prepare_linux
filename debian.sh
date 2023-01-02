@@ -88,7 +88,7 @@ apt install -y curl git
 #Changes if we suggest working in console on this machine
 apt install -y bash-completion
 #Replacing standard .bashrc with uncommented version for more colors and aliases
-mv .bashrc ~/.bashrc
+mv .bashrc /home/$SUDO_USER/.bashrc
 
 #Changing motd (ssh message after login), making it more informative with some diagnostic
 apt install -y coreutils bc procps hostname mawk bind9-host lsb-release
