@@ -1,15 +1,63 @@
 #!/bin/bash
-#Help message
+#shellcheck disable=all
+
+## DEFAULT ARGS
+logfile=$(basename -s .sh "$0").log
+logging=false #Not implemented yet
+install_sudo=false #Not used yet
+#It's good idea for future to specify dev or prod and server type for motd generation
+sysfunction="Nginx server" #Not implemented yet
+sysenv="Dev" #Not implemented yet
 
 function usage() {
+    echo "Usage: $(basename $0) [-h] [-l] [-r]"
+    echo " -l, --logging             Enables logging in defaul logfile (located in same dir as script)"
+    # echo " -s, --depth <number>        Subdirs depth generation. Default is 3."
+    # echo " -c, --subdirs <number>      Number of dirs to generate in each directory."
+    echo " --sysfunction <string>    Sysfunction like Nginx Server, Postgres Database and etc."
+    echo " --sysenv <string>         Sysenv like dev, production and etc."
+    echo " -h, --help                Show this help"
+    echo ""
     echo "This script performs essential initial stuff on fresh debian installation"
-    echo "Right now it doesn't accept any arguments"
+    echo "ATTENTION: copy your ssh key to machine BEFORE LAUNCHING this script"
+    echo "Debug information can be found in $logfile, if logging is enabled"
 }
 
-if [[ "$1" == -h || "$1" == --help ]]; then
-    usage
-    exit 0
-fi
+while :; do
+    case "$1" in
+    # -d | --directory)
+    #     shift
+    #     directory="$1"
+    #     shift
+    #     ;;
+    # -s | --depth)
+    #     shift
+    #     depth="$1"
+    #     shift
+    #     ;;
+    -l | --logging)
+        shift
+        logging=true
+        ;;
+    --sysfunction)
+        shift
+        sysfunction="$1"
+        shift
+        ;;
+    --sysenv)
+        shift
+        sysenv="$1"
+        shift
+        ;;
+    -h | --help)
+        usage
+        exit 0
+        ;;
+    *)
+        break
+        ;;
+    esac
+done
 
 #Attention: sudo isn't installed by default in some variants of debian installation
 #apt install sudo
@@ -30,6 +78,7 @@ $1 ~ /PermitEmptyPasswords/ {$1="PermitEmptyPasswords"; $2="no"}
 $1 ~ /PubkeyAuthentication/ {$1="PubkeyAuthentication"; $2="yes"}
 #Attention: some cloud providers and etc. can use prohibit-password to allow root ssh key auth
 $1 ~ /PermitRootLogin/ {$1="PermitRootLogin"; $2="no"}
+# $1 ~ /PubkeyAuthentication/ {$1="PrintMotd"; $2="yes"}
 {print}
 ' $file.old > $file
 
@@ -44,10 +93,7 @@ mv .bashrc ~/.bashrc
 #Changing motd (ssh message after login), making it more informative with some diagnostic
 apt install -y coreutils bc procps hostname mawk bind9-host lsb-release
 
-#It's good idea for future to specify dev or prod and server type for motd generation
-#Should be taken as script argument
-SYSFUNCTION="Nginx server"
-SYSENV="Dev"
+
 
 #Need some solution with tz-data default timezone
 
@@ -58,4 +104,7 @@ SYSENV="Dev"
 #https://www.redhat.com/sysadmin/cloud-swap
 
 #SSH informative message (MOTD - Message of the Day) is generated in motd.sh
-#We should decide whether move it to cron or generate only on ssh login via user
+chmod +x print_functions.sh motd.sh
+cp print_functions.sh /usr/bin/print_functions.sh
+cp motd.sh /usr/bin/motd.sh
+echo "*/5 * * * * root /usr/bin/motd.sh > /etc/motd" >> /etc/crontab

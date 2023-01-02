@@ -129,7 +129,12 @@ function get_memory() {
     # mem_used=$((mem_used * 1024))
     # mem_total=$((mem_total * 1024))
     # mem_label=KiB
-    memory="${mem_used}${mem_label:-MiB} / ${mem_total}${mem_label:-MiB} ${mem_perc:+(${mem_perc}%)}"
+    memory_bar=$(print_bar $WIDTH $mem_perc)
+    mem_used=$(print_color ${mem_used}${mem_label:-MiB} $mem_perc 65 85)
+    mem_perc_text=$(print_color ${mem_perc:+(${mem_perc}%)} $mem_perc 65 85)
+    # memory="${mem_used}${mem_label:-MiB} / ${mem_total}${mem_label:-MiB} ${mem_perc:+(${mem_perc}%)}"
+    memory="${mem_used} / ${CO}${mem_total}${mem_label:-MiB} $mem_perc_text"
+
 }
 
 function get_model() {
@@ -210,36 +215,27 @@ function generate_system_info() {
     #Get maxium usable procs
     PROCMAX=$(ulimit -u)
 
-    # #Async functions calls
-    # get_local_ip &
-    # get_public_ip &
-    # get_uptime &
-    # get_memory &
-    # get_model &
-    # get_loads_average &
-    # wait
-    get_local_ip 
-    get_public_ip 
-    get_uptime 
-    get_memory 
-    get_model 
-    get_loads_average 
+    get_local_ip
+    get_public_ip
+    get_uptime
+    get_memory
+    get_model
+    get_loads_average
 
-    #Display system information
-    #TODO: change relevant string colour if load average/cpu/memory usage is high
-    echo -e "
-${F2}============[ ${F1}System Info${F2} ]====================================================
-${F1}            Host ${F2}= ${F3}$model
-${F1}              OS ${F2}= ${F3}$DISTRIBUTION ${PLATFORM}
-${F1}          Kernel ${F2}= ${F3}$UNAME
-${F1}        Local IP ${F2}= ${F3}$local_ip
-${F1}       Public IP ${F2}= ${F3}$public_ip
-${F1}          Uptime ${F2}= ${F3}$uptime
-${F1}             CPU ${F2}= ${F3}$CPUS x $CPUMODEL
-${F1}    Load average ${F2}= ${F3}$load_average
-${F1}          Memory ${F2}= ${F3}$memory
-${F1}     Swap Memory ${F2}= ${F3}$SWAPFREE MB Free of $SWAPMAX MB Total
-${F1}       Processes ${F2}= ${F3}$PROCCOUNT of $PROCMAX MAX${F1}">system_info
+
+echo "Welcome to $HOSTNAME" >system_info
+print_columns "Host model" "$model" >>system_info
+print_columns "OS" "$DISTRIBUTION ${PLATFORM}" >>system_info
+print_columns "Kernel" "$UNAME" >>system_info
+print_columns "Local IP" "$local_ip" >>system_info
+print_columns "Public IP" "$public_ip" >>system_info
+print_columns "Uptime" "$uptime" >>system_info
+print_columns "CPU" "$CPUS x $CPUMODEL" >>system_info
+print_columns "Load Average" "$load_average" >>system_info
+print_columns "Memory" "$memory" >>system_info
+echo -e $memory_bar >>system_info
+print_columns "Swap Memory" "$SWAPFREE MB Free of $SWAPMAX MB Total" >>system_info
+print_columns "Processes" "$PROCCOUNT of $PROCMAX MAX" >>system_info
 }
 
 ## Storage Informations
@@ -264,19 +260,16 @@ function generate_disk_info() {
     disk_info=""
     while IFS= read -r disk; do
         IFS=" " read -r filesystem _ total used free percentage mountpoint <<<"${disk}"
-
         device=$(sed 's|/dev||g;s|/mapper||g;s|^/||g' <<<"${filesystem}")
         left_label="${device} () - ${used} used, ${free} free"
         right_label="/ ${total}"
         free_width=$((WIDTH - ${#left_label} - ${#right_label} - 1))
         mountpoint=$(print_truncate "${mountpoint}" ${free_width} "start")
         left_label="${device} (${mountpoint}) - ${used} used, ${free} free"
-
         label=$(print_split "${WIDTH}" "${left_label}" "${right_label}")
         disk_info+="${label}\n$(print_bar "${WIDTH}" "${percentage::-1}")\n"
     done <<<"${disks}"
-        print_columns "Disk space" "${disk_info::-2}">disk_info
-
+    print_columns "Disk space" "${disk_info::-2}" >disk_info
 }
 
 #User Informations
@@ -338,18 +331,15 @@ function generate_services_info() {
     services["sshd"]="SSH"
     services["fail2ban"]="Fail2Ban"
     services["ufw"]="UFW"
-
     statuses=()
-
     for key in "${!services[@]}"; do
         if [[ $(systemctl list-unit-files "${key}*" | wc -l) -gt 3 ]]; then
             status=$(systemctl show -p ActiveState --value "${key}")
             statuses+=("$(print_status "${services[${key}]}" "${status}")")
         fi
     done
-
     services_info=$(print_wrap "${WIDTH}" "${statuses[@]}")
-        print_columns "Services" "${services_info}">services
+    print_columns "Services" "${services_info}" >services
 
 }
 
@@ -373,7 +363,7 @@ function generate_docker_info() {
                 docker_info+="$(print_split "${WIDTH}" "${name}" "${color}${description,,}${CN}")\n"
             done <<<"${containers}"
         fi
-        print_columns "Docker" "${docker_info::-2}">docker
+        print_columns "Docker" "${docker_info::-2}" >docker
     fi
 
 }
@@ -393,12 +383,10 @@ function generate_updates_info() {
         updates="N/A"
     fi
     updates_info="$(print_color "${updates} available" ${updates} 1 50)"
-        print_columns "Updates" "${updates_info}">updates
+    print_columns "Updates" "${updates_info}" >updates
 
 }
 function show_info() {
-    #TODO: implement parallel execution, but save output order
-    #For this we need save temporary output and divide all in smaller functions
     generate_system_info &
     generate_disk_info &
     generate_services_info &
@@ -411,7 +399,7 @@ function show_info() {
     cat services
     cat docker
     cat updates
-    
+
     # show_user_info
     # show_update_info
     # show_environment_info
