@@ -331,6 +331,7 @@ function generate_services_info() {
     services["sshd"]="SSH"
     services["fail2ban"]="Fail2Ban"
     services["ufw"]="UFW"
+    services["jenkins"]="Jenkins"
     statuses=()
     for key in "${!services[@]}"; do
         if [[ $(systemctl list-unit-files "${key}*" | wc -l) -gt 3 ]]; then
