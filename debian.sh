@@ -5,6 +5,7 @@
 logfile=$(basename -s .sh "$0").log
 logging=false #Not implemented yet
 install_sudo=false #Not used yet
+install_nginx=false
 #It's good idea for future to specify dev or prod and server type for motd generation
 sysfunction="Nginx server" #Not implemented yet
 sysenv="Dev" #Not implemented yet
@@ -12,7 +13,7 @@ sysenv="Dev" #Not implemented yet
 function usage() {
     echo "Usage: $(basename $0) [-h] [-l] [-r]"
     echo " -l, --logging             Enables logging in defaul logfile (located in same dir as script)"
-    # echo " -s, --depth <number>        Subdirs depth generation. Default is 3."
+    echo " -n, --nginx               Install nginx-light with php-fpm"
     # echo " -c, --subdirs <number>      Number of dirs to generate in each directory."
     echo " --sysfunction <string>    Sysfunction like Nginx Server, Postgres Database and etc."
     echo " --sysenv <string>         Sysenv like dev, production and etc."
@@ -30,11 +31,10 @@ while :; do
     #     directory="$1"
     #     shift
     #     ;;
-    # -s | --depth)
-    #     shift
-    #     depth="$1"
-    #     shift
-    #     ;;
+    -n | --nginx)
+        install_nginx=true
+        shift
+        ;;
     -l | --logging)
         shift
         logging=true
@@ -93,8 +93,6 @@ mv .bashrc /home/$SUDO_USER/.bashrc
 #Changing motd (ssh message after login), making it more informative with some diagnostic
 apt install -y coreutils bc procps hostname mawk bind9-host lsb-release
 
-
-
 #Need some solution with tz-data default timezone
 
 #TODO: suggest making swap according to ram memory
@@ -108,3 +106,7 @@ chmod +x print_functions.sh motd.sh
 cp print_functions.sh /usr/bin/print_functions.sh
 cp motd.sh /usr/bin/motd.sh
 grep "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" /etc/crontab || echo "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" >> /etc/crontab
+
+if install_nginx; then 
+source nginx.sh
+fi

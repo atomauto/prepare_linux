@@ -1,0 +1,22 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        listen 443 ssl default_server;
+        listen [::]:443 ssl default_server;
+        include snippets/snakeoil.conf;
+        root /var/www/html;
+        index index.php index.htm index.nginx-debian.html;
+        server_name _;
+        access_log /var/log/nginx/access.log;
+        error_log /var/log/nginx/error.log;
+        location / {
+                try_files $uri $uri/ =404;
+        }
+        location ~ \.php$ {
+              include snippets/fastcgi-php.conf;
+              fastcgi_pass unix:/run/php/php-fpm.sock;
+        }
+        location ~ /\.ht {
+              deny all;
+        }
+}
