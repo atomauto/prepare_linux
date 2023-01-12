@@ -7,4 +7,5 @@ service nginx restart
 chown -R www-data:www-data /var/www
 apt install -y logrotate
 echo "php_admin_flag[expose_php] = off" >> /etc/php/7.4/fpm/php-fpm.conf
-service php7.4-fpm restart && service nginx restart
+service php7.4-fpm start
+service nginx restart
