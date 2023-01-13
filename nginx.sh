@@ -1,4 +1,9 @@
 #!/bin/bash
+### DOCKER ###
+#One liner for docker
+#apt update && apt install git -y && git clone https://github.com/atomauto/prepare_linux && cd prepare_linux && chmod +x debian.sh && ./debian.sh --nginx
+#Command to change CMD for image (troubling quotes)
+#docker commit --change='CMD ["nginx", "-g", "daemon off;", "php", "-a"]'' php-nginx-light
 apt install -y nginx-light php-fpm php-pear php-cgi php-common php-mbstring php-zip php-net-socket php-gd php-xml-util php-mysql php-bcmath unzip
 mv etc/nginx/nginx.conf /etc/nginx/nginx.conf
 mv etc/nginx/sites-available/default /etc/nginx/sites-available/default
