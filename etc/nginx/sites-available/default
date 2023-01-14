@@ -1,9 +1,6 @@
 server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        listen 443 ssl default_server;
-        listen [::]:443 ssl default_server;
-        include snippets/snakeoil.conf;
         root /var/www/html;
         index index.php index.htm index.nginx-debian.html;
         server_name _;
