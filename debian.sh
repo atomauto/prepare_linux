@@ -14,6 +14,7 @@ swap=false
 function usage() {
     echo "Usage: $(basename $0) [-h] [-l] [-r]"
     echo " -l, --logging             Enables logging in defaul logfile (located in same dir as script)"
+    echo " -d, --docker              Install docker"
     echo " -n, --nginx               Install nginx-light with php-fpm"
     echo " -s, --swap <size>         Make swap with size and add it to fstab. Syntax of size is a syntax for -l of fallocate."
     # echo " -c, --subdirs <number>      Number of dirs to generate in each directory."
@@ -28,11 +29,10 @@ function usage() {
 
 while :; do
     case "$1" in
-    # -d | --directory)
-    #     shift
-    #     directory="$1"
-    #     shift
-    #     ;;
+    -d | --docker)
+        install_docker=true
+        shift
+        ;;
     -n | --nginx)
         install_nginx=true
         shift
