@@ -401,9 +401,11 @@ function show_info() {
     cat docker
     cat updates
 
-    # show_user_info
-    # show_update_info
-    # show_environment_info
+    rm system_info
+    rm disk_info
+    rm services
+    rm docker
+    rm updates
 }
 
 #If no parameter is passed then start show_info
