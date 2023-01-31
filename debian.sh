@@ -3,17 +3,19 @@
 
 ## DEFAULT ARGS
 logfile=$(basename -s .sh "$0").log
-logging=false #Not implemented yet
+logging=false      #Not implemented yet
 install_sudo=false #Not used yet
 install_nginx=false
 #It's good idea for future to specify dev or prod and server type for motd generation
 sysfunction="Nginx server" #Not implemented yet
-sysenv="Dev" #Not implemented yet
+sysenv="Dev"               #Not implemented yet
+swap=false
 
 function usage() {
     echo "Usage: $(basename $0) [-h] [-l] [-r]"
     echo " -l, --logging             Enables logging in defaul logfile (located in same dir as script)"
     echo " -n, --nginx               Install nginx-light with php-fpm"
+    echo " -s, --swap <size>         Make swap with size and add it to fstab. Syntax of size is a syntax for -l of fallocate."
     # echo " -c, --subdirs <number>      Number of dirs to generate in each directory."
     echo " --sysfunction <string>    Sysfunction like Nginx Server, Postgres Database and etc."
     echo " --sysenv <string>         Sysenv like dev, production and etc."
@@ -38,6 +40,12 @@ while :; do
     -l | --logging)
         shift
         logging=true
+        ;;
+    -s | --swap)
+        shift
+        swap=true
+        swap_size="$1"
+        shift
         ;;
     --sysfunction)
         shift
@@ -71,7 +79,7 @@ apt full-upgrade -y
 #TODO: Script changes only existing lines, it doesn't add new
 file=/etc/ssh/sshd_config
 cp -p $file $file.old &&
-awk '
+    awk '
 $1 ~ /StrictModes/ {$1="StrictModes"; $2="yes"}
 $1 ~ /PasswordAuthentication/ {$1="PasswordAuthentication"; $2="no"}
 $1 ~ /PermitEmptyPasswords/ {$1="PermitEmptyPasswords"; $2="no"}
@@ -80,7 +88,15 @@ $1 ~ /PubkeyAuthentication/ {$1="PubkeyAuthentication"; $2="yes"}
 $1 ~ /PermitRootLogin/ {$1="PermitRootLogin"; $2="no"}
 # $1 ~ /PubkeyAuthentication/ {$1="PrintMotd"; $2="yes"}
 {print}
-' $file.old > $file
+' $file.old >$file
+
+if $swap; then
+    fallocate -l $swap_size /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    echo "/swapfile    none    swap    sw    0    0" >>/etc/fstab
+fi
 
 #Curl is necessary for many things, git is necessary for getting all other scripts
 apt install -y curl git
@@ -105,8 +121,8 @@ apt install -y coreutils bc procps hostname mawk bind9-host lsb-release
 chmod +x print_functions.sh motd.sh
 cp print_functions.sh /usr/bin/print_functions.sh
 cp motd.sh /usr/bin/motd.sh
-grep "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" /etc/crontab || echo "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" >> /etc/crontab
+grep "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" /etc/crontab || echo "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" >>/etc/crontab
 
-if $install_nginx; then 
-source nginx.sh
+if $install_nginx; then
+    source nginx.sh
 fi
