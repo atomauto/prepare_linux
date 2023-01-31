@@ -222,20 +222,19 @@ function generate_system_info() {
     get_model
     get_loads_average
 
-
-echo "Welcome to $HOSTNAME" >system_info
-print_columns "Host model" "$model" >>system_info
-print_columns "OS" "$DISTRIBUTION ${PLATFORM}" >>system_info
-print_columns "Kernel" "$UNAME" >>system_info
-print_columns "Local IP" "$local_ip" >>system_info
-print_columns "Public IP" "$public_ip" >>system_info
-print_columns "Uptime" "$uptime" >>system_info
-print_columns "CPU" "$CPUS x $CPUMODEL" >>system_info
-print_columns "Load Average" "$load_average" >>system_info
-print_columns "Memory" "$memory" >>system_info
-echo -e $memory_bar >>system_info
-print_columns "Swap Memory" "$SWAPFREE MB Free of $SWAPMAX MB Total" >>system_info
-print_columns "Processes" "$PROCCOUNT of $PROCMAX MAX" >>system_info
+    echo "Welcome to $HOSTNAME" >system_info
+    print_columns "Host model" "$model" >>system_info
+    print_columns "OS" "$DISTRIBUTION ${PLATFORM}" >>system_info
+    print_columns "Kernel" "$UNAME" >>system_info
+    print_columns "Local IP" "$local_ip" >>system_info
+    print_columns "Public IP" "$public_ip" >>system_info
+    print_columns "Uptime" "$uptime" >>system_info
+    print_columns "CPU" "$CPUS x $CPUMODEL" >>system_info
+    print_columns "Load Average" "$load_average" >>system_info
+    print_columns "Memory" "$memory" >>system_info
+    echo -e $memory_bar >>system_info
+    print_columns "Swap Memory" "$SWAPFREE MB Free of $SWAPMAX MB Total" >>system_info
+    print_columns "Processes" "$PROCCOUNT of $PROCMAX MAX" >>system_info
 }
 
 ## Storage Informations
@@ -400,12 +399,6 @@ function show_info() {
     cat services
     cat docker
     cat updates
-
-    rm system_info
-    rm disk_info
-    rm services
-    rm docker
-    rm updates
 }
 
 #If no parameter is passed then start show_info
