@@ -123,6 +123,10 @@ cp print_functions.sh /usr/bin/print_functions.sh
 cp motd.sh /usr/bin/motd.sh
 grep "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" /etc/crontab || echo "*/5 * * * * root /usr/bin/motd.sh > /etc/motd 2>/dev/null" >>/etc/crontab
 
+if $install_docker; then
+    source docker.sh
+fi
+
 if $install_nginx; then
     source nginx.sh
 fi
