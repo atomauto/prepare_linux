@@ -13,11 +13,11 @@ swap=false
 
 function usage() {
     echo "Usage: $(basename $0) [-h] [-l] [-r]"
-    echo " -l, --logging             Enables logging in defaul logfile (located in same dir as script)"
-    echo " -d, --docker              Install docker"
-    echo " -n, --nginx               Install nginx-light with php-fpm"
-    echo " -s, --swap <size>         Make swap with size and add it to fstab. Syntax of size is a syntax for -l of fallocate."
-    # echo " -c, --subdirs <number>      Number of dirs to generate in each directory."
+    echo " -l,  --logging             Enables logging in defaul logfile (located in same dir as script)"
+    echo " -d,  --docker              Install docker"
+    echo " -n,  --nginx               Install nginx-light with php-fpm"
+    echo " -no, --nomad              Install nomad,vault and consul"
+    echo " -s,  --swap <size>         Make swap with size and add it to fstab. Syntax of size is a syntax for -l of fallocate."
     echo " --sysfunction <string>    Sysfunction like Nginx Server, Postgres Database and etc."
     echo " --sysenv <string>         Sysenv like dev, production and etc."
     echo " -h, --help                Show this help"
@@ -35,6 +35,10 @@ while :; do
         ;;
     -n | --nginx)
         install_nginx=true
+        shift
+        ;;
+    -no | --nomad)
+        install_nomad=true
         shift
         ;;
     -l | --logging)
@@ -129,4 +133,8 @@ fi
 
 if $install_nginx; then
     source nginx.sh
+fi
+
+if $install_nomad; then
+    source nomad.sh
 fi
