@@ -6,6 +6,7 @@ logfile=$(basename -s .sh "$0").log
 logging=false      #Not implemented yet
 install_sudo=false #Not used yet
 install_nginx=false
+install_nomad=false
 #It's good idea for future to specify dev or prod and server type for motd generation
 sysfunction="Nginx server" #Not implemented yet
 sysenv="Dev"               #Not implemented yet
